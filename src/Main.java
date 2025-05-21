@@ -8,5 +8,9 @@ public class Main {
         String filePath = "C:\\Users\\Matth\\IdeaProjects\\HUE-dini\\test_infographic.jpg";
 
         BufferedImage testImage = ImageHandler.loadImageFromFilePath(filePath);
+
+        // now we need to find the key in the image
+
+
     }
 }
