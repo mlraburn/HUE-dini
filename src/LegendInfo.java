@@ -27,4 +27,23 @@ public class LegendInfo {
         }
     }
 
+    private List<LegendColor> legendColors;
+    private Rectangle legendBoundingBox;
+
+    public LegendInfo() {
+        legendColors = new ArrayList<>();
+    }
+
+    // methods to add colors and set legend areas
+    public void addLegendColor(Color color, Rectangle boundingBox) {
+        legendColors.add(new LegendColor(color, boundingBox));
+    }
+
+    public void setLegendBoundingBox(Rectangle legendBoundingBox) {
+        this.legendBoundingBox = legendBoundingBox;
+    }
+
+    // Getters
+    public List<LegendColor> getLegendColors() { return legendColors; }
+    public Rectangle getLegendBoundingBox() { return legendBoundingBox; }
 }
