@@ -17,4 +17,15 @@ public class LegendDetector {
         nu.pattern.OpenCV.loadLocally();
     }
 
+    /**
+     * Detects potential legend colors in an image
+     * @param bufferedImage Input image
+     * @return LegendInfo containing detected colors and their locations
+     */
+    public LegendInfo detectLegendColors(BufferedImage bufferedImage) {
+        // Convert image to OpenCV Mat
+        Mat imageMat = bufferedImage(bufferedImage);
+
+    }
+
 }
