@@ -13,7 +13,12 @@ import java.util.List;
 public class LegendDetector {
 
     static {
-        // Load OpenCV native library
+        // Load OpenCV native library on first Class Load
+        // OpenCV is c++ so we need to load a java way to run the code on any machine (.loadLocally())
+        // nu is OpenCV's package name
+        // pattern is their pattern recognition portion
+        // .OpenCV is the class name
+        // Don't import this to better deal with import naming issues
         nu.pattern.OpenCV.loadLocally();
     }
 
