@@ -6,6 +6,8 @@ import java.util.List;
 public class LegendInfo {
 
     public static class LegendColor {
+        // the class has 2 properties
+        // each legend element has a color and a bounding box
         private Color color;
         private Rectangle boundingBox;
 
