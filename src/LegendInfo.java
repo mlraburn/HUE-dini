@@ -22,6 +22,8 @@ public class LegendInfo {
 
         @Override
         public String toString() {
+            // prints out a string with each RGB component
+            // and the bounding box
             return "Color: RGB:(" + color.getRed() + ", "
                                   + color.getGreen() + ", "
                                   + color.getBlue() + "), "
