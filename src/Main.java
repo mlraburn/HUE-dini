@@ -9,7 +9,18 @@ public class Main {
 
         BufferedImage testImage = ImageHandler.loadImageFromFilePath(filePath);
 
-        // now we need to find the key in the image
+        // find the legend in the image
+        LegendDetector detector = new LegendDetector();
+
+        // Detect Legend Colors
+        LegendInfo legendInfo = detector.detectLegendColors(testImage);
+
+        System.out.println("Detected: " + legendInfo.getLegendColors().size() + " potential legend colors:");
+        for (LegendInfo.LegendColor color : legendInfo.getLegendColors()) {
+            System.out.println(color);
+        }
+
+
 
 
     }
