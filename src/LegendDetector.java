@@ -83,15 +83,25 @@ public class LegendDetector {
         Mat mat = new Mat(image.getHeight(), image.getWidth(), CvType.CV_8UC3);
 
         // Check if the image has an alpha channel
+        // First we check default case which is just 3 channel image
         if (image.getType() == BufferedImage.TYPE_3BYTE_BGR) {
+            // grab actual RGB data from Raster store in byte array
             byte[] data = ((DataBufferByte) image.getRaster().getDataBuffer()).getData();
+            // add 1D byte array as 2d Mat
             mat.put(0, 0, data);
-        } else {
-            // Convert to TYPE_3BYTE_BGR if it's not already
+        } else {  // This block runs if the image has an alpha channel (transparency channel)
+            // create a blank BufferedImage that doesn't have an alpha channel because of
+            // the .TYPE_3BYTE_BGR
             BufferedImage convertedImg = new BufferedImage(
                     image.getWidth(), image.getHeight(), BufferedImage.TYPE_3BYTE_BGR);
+
+            // now paint the original image with alpha channel onto new non alpha channel image
+            // this will create a composite color based on transparency and background
             convertedImg.getGraphics().drawImage(image, 0, 0, null);
+
+            // grab raster 1D array for image
             byte[] data = ((DataBufferByte) convertedImg.getRaster().getDataBuffer()).getData();
+            // add 1D array to 2D Mat file
             mat.put(0, 0, data);
         }
 
