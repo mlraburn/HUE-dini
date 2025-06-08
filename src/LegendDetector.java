@@ -28,7 +28,7 @@ public class LegendDetector {
         // This will allow for analysis to be done using OpenCV
         Mat imageMat = bufferedImageToMat(bufferedImage);
 
-        // Create result object
+        // Create LegendInfo object that will hold the info for the legend in the image
         LegendInfo legendInfo = new LegendInfo();
 
         // PSEUDOCODE:
@@ -37,13 +37,13 @@ public class LegendDetector {
         // 3. Extract colors from those regions
         // 4. Add results to LegendInfo object
 
-        // Step 1: Convert to appropriate color space for processing
+        // Convert Mat 3 Byte BGR image to Mat HSV format
         Mat hsvImage = new Mat();
-        Imgproc.cvtColor(imageMat, hsvImage, Imgproc.COLOR_BGR2HSV);
+        Imgproc.cvtColor(imageMat, hsvImage, Imgproc.COLOR_BGR2HSV);  // convert the BGR to HSV
 
         // Step 2: Find potential legend regions
         // This is a basic implementation - we'll look for contours of similar size/shape
-        List<MatOfPoint> contours = findPotentialLegendElements(imageMat);
+        List<MatOfPoint> contours = findPotentialLegendElements(hsvImage);
 
         // Step 3: Filter contours to find likely legend color squares/circles
         List<MatOfPoint> legendContours = filterLegendContours(contours);
@@ -91,7 +91,10 @@ public class LegendDetector {
             byte[] data = ((DataBufferByte) image.getRaster().getDataBuffer()).getData();
             // add 1D byte array as 2d Mat
             mat.put(0, 0, data);
-        } else {  // This block runs if the image has an alpha channel (transparency channel)
+
+        // This block runs if the image has an alpha channel (transparency channel) or if it is
+        // anything other than a 3 Byte BGR
+        } else {
             // create a blank BufferedImage that doesn't have an alpha channel because of
             // the .TYPE_3BYTE_BGR
             BufferedImage convertedImg = new BufferedImage(
@@ -99,6 +102,8 @@ public class LegendDetector {
 
             // now paint the original image with alpha channel onto new non alpha channel image
             // this will create a composite color based on transparency and background
+            // if it doesn't have an alpha channel then it will convert the RGB to a BGR
+            // automatically in the .getGraphics.drawImage function
             convertedImg.getGraphics().drawImage(image, 0, 0, null);
 
             // grab raster 1D array for image
