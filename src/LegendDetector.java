@@ -70,9 +70,11 @@ public class LegendDetector {
     }
 
     /**
-     * Convert BufferedImage to OpenCV Mat
-     * Its actually wild there isn't one of these built
-     * into the BufferedImage Class
+     * Takes a Buffered Image and converts it to Mat
+     * It can handle alpha channel files and will convert
+     * them to a composite image without alpha channel
+     * @param image Image to convert
+     * @return a Mat format object
      */
     private Mat bufferedImageToMat(BufferedImage image) {
         // Convert BufferedImage to Mat
