@@ -25,6 +25,7 @@ public class LegendDetector {
      */
     public LegendInfo detectLegendColors(BufferedImage bufferedImage) {
         // Convert BufferedImage to OpenCV Mat
+        // This will allow for analysis to be done using OpenCV
         Mat imageMat = bufferedImageToMat(bufferedImage);
 
         // Create result object
@@ -70,9 +71,15 @@ public class LegendDetector {
 
     /**
      * Convert BufferedImage to OpenCV Mat
+     * Its actually wild there isn't one of these built
+     * into the BufferedImage Class
      */
     private Mat bufferedImageToMat(BufferedImage image) {
         // Convert BufferedImage to Mat
+        // We create an empty Mat image with a specific format of CV_8UC3
+        // CV for the OpenCV
+        // 8U for 8 Bit unsigned so we have color channels from 0 - 255
+        // C3 for the 3 color channels which will be BGR because OpenCV is weird
         Mat mat = new Mat(image.getHeight(), image.getWidth(), CvType.CV_8UC3);
 
         // Check if the image has an alpha channel
