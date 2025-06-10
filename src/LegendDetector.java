@@ -4,6 +4,9 @@ import org.opencv.imgproc.Imgproc;
 import org.opencv.core.Mat;
 import org.opencv.core.Scalar;
 
+import javax.imageio.ImageIO;
+import java.io.File;
+import java.io.IOException;
 import java.awt.Color;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
@@ -124,18 +127,22 @@ public class LegendDetector {
      */
     private List<MatOfPoint> findPotentialLegendElements(Mat image) {
         // First, create a grayscale version for contour detection
-        // We do this because its much easier to find boundaries with grey scale
+        // We do this because its much easier to find boundaries with gray scale
         Mat grayImage = new Mat();
         Imgproc.cvtColor(image, grayImage, Imgproc.COLOR_BGR2GRAY);
+        saveMatAsImage(grayImage, "debug_01_grayscale.png");
 
         // Apply Gaussian blur to reduce noise
+        // Allows us to not find tons of contours
         Imgproc.GaussianBlur(grayImage, grayImage, new Size(5, 5), 0);
+        saveMatAsImage(grayImage, "debug_02_blurred.png");
 
         // Apply adaptive threshold to get binary image
-        Mat binaryImage = new Mat();
+        Mat binaryImage = new Mat();  // This is a black and white image
         Imgproc.adaptiveThreshold(grayImage, binaryImage, 255,
                 Imgproc.ADAPTIVE_THRESH_GAUSSIAN_C,
                 Imgproc.THRESH_BINARY_INV, 11, 2);
+        saveMatAsImage(binaryImage, "debug_03_binary.png");
 
         // Find contours
         List<MatOfPoint> contours = new ArrayList<>();
@@ -143,6 +150,41 @@ public class LegendDetector {
         Imgproc.findContours(binaryImage, contours, hierarchy,
                 Imgproc.RETR_TREE, Imgproc.CHAIN_APPROX_SIMPLE);
 
+        // Optional: Create an image showing all detected contours
+        Mat contoursImage = Mat.zeros(image.size(), CvType.CV_8UC3);
+        for (int i = 0; i < contours.size(); i++) {
+            Scalar color = new Scalar(0, 255, 0); // Green contours
+            Imgproc.drawContours(contoursImage, contours, i, color, 2);
+        }
+        saveMatAsImage(contoursImage, "debug_05_all_contours.png");
+
+        // Create an overlay image showing contours on the original image
+        Mat overlayImage = image.clone(); // Start with a copy of the original
+
+        // Draw all contours on the original image
+        for (int i = 0; i < contours.size(); i++) {
+            Scalar color = new Scalar(0, 255, 0); // Green contours (BGR format)
+            Imgproc.drawContours(overlayImage, contours, i, color, 2);
+        }
+        saveMatAsImage(overlayImage, "debug_06_contours_overlay.png");
+
+        // Optional: Also create a version with contour numbers for detailed analysis
+        Mat numberedOverlay = image.clone();
+        for (int i = 0; i < contours.size(); i++) {
+            // Draw the contour
+            Scalar green = new Scalar(0, 255, 0);
+            Imgproc.drawContours(numberedOverlay, contours, i, green, 2);
+
+            // Add contour number as text
+            Rect boundingBox = Imgproc.boundingRect(contours.get(i));
+            Point textLocation = new Point(boundingBox.x, boundingBox.y - 5);
+            Scalar red = new Scalar(0, 0, 255); // Red text
+            Imgproc.putText(numberedOverlay, String.valueOf(i), textLocation,
+                    Imgproc.FONT_HERSHEY_SIMPLEX, 0.5, red, 1);
+        }
+        saveMatAsImage(numberedOverlay, "debug_07_numbered_contours.png");
+
+        System.out.println("Found " + contours.size() + " total contours");
         return contours;
     }
 
@@ -191,6 +233,47 @@ public class LegendDetector {
 
         // Calculate mean color
         return Core.mean(image.submat(region));
+    }
+
+    /**
+     * Saves a Mat object as an image file for debugging purposes
+     * @param mat The Mat to save
+     * @param filename The output filename (should include .png or .jpg extension)
+     */
+    private void saveMatAsImage(Mat mat, String filename) {
+        try {
+            // Convert Mat back to BufferedImage for saving
+            BufferedImage bufferedImage = matToBufferedImage(mat);
+            File outputFile = new File(filename);
+            ImageIO.write(bufferedImage, "PNG", outputFile);
+            System.out.println("Saved debug image: " + filename);
+        } catch (IOException e) {
+            System.err.println("Error saving debug image " + filename + ": " + e.getMessage());
+        }
+    }
+
+    /**
+     * Converts an OpenCV Mat back to a BufferedImage
+     * @param mat The Mat to convert (can be grayscale or color)
+     * @return BufferedImage for saving or display
+     */
+    private BufferedImage matToBufferedImage(Mat mat) {
+        int type = BufferedImage.TYPE_BYTE_GRAY;
+        if (mat.channels() > 1) {
+            type = BufferedImage.TYPE_3BYTE_BGR;
+        }
+
+        // Calculate the size of the buffer needed (channels * columns * rows)
+        int bufferSize = mat.channels() * mat.cols() * mat.rows();
+        byte[] buffer = new byte[bufferSize];
+        mat.get(0, 0, buffer); // Get all pixel data
+
+        // Create blank BufferedImage of correct syze and type
+        BufferedImage image = new BufferedImage(mat.cols(), mat.rows(), type);
+        final byte[] targetPixels = ((DataBufferByte) image.getRaster().getDataBuffer()).getData();
+        System.arraycopy(buffer, 0, targetPixels, 0, buffer.length);
+
+        return image;
     }
 
     /**
