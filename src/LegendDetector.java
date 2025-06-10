@@ -116,10 +116,15 @@ public class LegendDetector {
     }
 
     /**
-     * Find all potential legend elements using contour detection
+     * List returns a list of MatOfPoints which are basically
+     * Contours or outlines within a Mat file
+     *
+     * @param image in the Mat format that is HSV formated
+     * @return a list of MatOfPoints which are really contours
      */
     private List<MatOfPoint> findPotentialLegendElements(Mat image) {
         // First, create a grayscale version for contour detection
+        // We do this because its much easier to find boundaries with grey scale
         Mat grayImage = new Mat();
         Imgproc.cvtColor(image, grayImage, Imgproc.COLOR_BGR2GRAY);
 
