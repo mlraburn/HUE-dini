@@ -195,6 +195,8 @@ public class LegendDetector {
         data.convertTo(data, CvType.CV_32F);
 
         // Apply k-means clustering to reduce colors
+        // This number is on of the free parameters
+        // 3 tends to work best for most images
         int k = 3;
         Mat labels = new Mat();
         Mat centers = new Mat();
