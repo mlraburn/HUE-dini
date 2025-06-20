@@ -260,14 +260,40 @@ public class LegendDetector {
         Imgproc.cvtColor(hsvImage, bgrImage, Imgproc.COLOR_HSV2BGR);
 
         // Method 1: Watershed segmentation for region detection
-        List<MatOfPoint> watershedContours = findWatershedRegions(bgrImage);  // ✅ Correct type
-        allContours.addAll(watershedContours);
+        // This method sucked
+        //List<MatOfPoint> watershedContours = findWatershedRegions(bgrImage);  // ✅ Correct type
+        //allContours.addAll(watershedContours);
 
         // Method 2: Simple connected components on quantized image
         List<MatOfPoint> componentContours = findConnectedComponents(bgrImage);  // ✅ Correct type
-        allContours.addAll(componentContours);
+
+        // Filter out only closed contours
+
+        for (MatOfPoint contour : componentContours) {
+            if (isClosedContour(contour)) {
+                allContours.add(contour);
+            } else {
+                System.out.println("Not Closed contour: " + contour);
+            }
+        }
 
         return allContours;
+    }
+
+    /**
+     * Check whether the contour is closed
+     */
+    private boolean isClosedContour(MatOfPoint contour) {
+        Point[] points = contour.toArray();
+        if (points.length < 3) return false; // must have at least 3 points for closed shape
+
+        Point firstPoint = points[0];
+        Point lastPoint = points[points.length - 1];
+
+        // Euclidean distance (pythagorean)
+        double distance = Math.sqrt(Math.pow(firstPoint.x - lastPoint.x, 2) + Math.pow(firstPoint.y - lastPoint.y, 2));
+
+        return distance < 15.0;  // allows for small variations
     }
 
     /**
