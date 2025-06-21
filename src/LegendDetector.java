@@ -149,6 +149,10 @@ public class LegendDetector {
         // Approach 3: Find contours based on color differences, not just brightness
         List<MatOfPoint> contours = findContoursFromColorSegmentation(quantizedImage);
 
+        // Close off contours
+        // Here we want to close the contours
+        // We will connect the first point to the last point
+
         // Debug: show all found contours ON THE ORIGINAL IMAGE
         Mat contoursOverlay = originalBgr.clone(); // Now using the original BGR image!
         for (int i = 0; i < contours.size(); i++) {
@@ -265,35 +269,7 @@ public class LegendDetector {
         //allContours.addAll(watershedContours);
 
         // Method 2: Simple connected components on quantized image
-        List<MatOfPoint> componentContours = findConnectedComponents(bgrImage);  // ✅ Correct type
-
-        // Filter out only closed contours
-
-        for (MatOfPoint contour : componentContours) {
-            if (isClosedContour(contour)) {
-                allContours.add(contour);
-            } else {
-                System.out.println("Not Closed contour: " + contour);
-            }
-        }
-
-        return allContours;
-    }
-
-    /**
-     * Check whether the contour is closed
-     */
-    private boolean isClosedContour(MatOfPoint contour) {
-        Point[] points = contour.toArray();
-        if (points.length < 3) return false; // must have at least 3 points for closed shape
-
-        Point firstPoint = points[0];
-        Point lastPoint = points[points.length - 1];
-
-        // Euclidean distance (pythagorean)
-        double distance = Math.sqrt(Math.pow(firstPoint.x - lastPoint.x, 2) + Math.pow(firstPoint.y - lastPoint.y, 2));
-
-        return distance < 15.0;  // allows for small variations
+        return findConnectedComponents(bgrImage);  // ✅ Correct type
     }
 
     /**
