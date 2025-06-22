@@ -153,6 +153,7 @@ public class LegendDetector {
         // Here we want to close the contours
         // We will connect the first point to the last point
 
+
         // Debug: show all found contours ON THE ORIGINAL IMAGE
         Mat contoursOverlay = originalBgr.clone(); // Now using the original BGR image!
         for (int i = 0; i < contours.size(); i++) {
@@ -163,6 +164,17 @@ public class LegendDetector {
 
         System.out.println("Found " + contours.size() + " color-based contours");
         return contours;
+    }
+
+    /**
+     * Close off the contours
+     */
+    private MatOfPoint closeOffContour(MatOfPoint contour) {
+        // we want to add another point and make it be the same as the OG first point so the first and last point are
+        // the same point
+
+        // we should check first to see if we can just make a bounding box instead using the contour but
+        // lets figure it out later
     }
 
     /**
